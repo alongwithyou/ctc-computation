@@ -12,12 +12,14 @@ using namespace std;
 void sub_max(float **(&params),int array_n,int array_m)
 {
     //search the largest value in the column of the array/matrix
-	fprintf(stdout, "rows : %d\ncols : %d\n", array_m, array_n);
+	fprintf(stdout, "rows(array_m) : %d\ncols(array_n) : %d\n", array_m, array_n);
     for(int i=0;i<array_m;i++)
     {
+		fprintf(stdout, "Check the %dth frame to find the best prob of current phoneme state\n", i);
         float colum_max=params[0][i];
         for(int j=0;j<array_n;j++)
         {
+			fprintf(stdout, "Check the %dth state to find the best prob of phoneme state at this frame\n", j);
             if(params[j][i]>colum_max)
                 colum_max=params[j][i];
         }
@@ -48,6 +50,7 @@ void array_sum_column(float (**params),float *(&sum_of_column),int array_n,int a
 }
 void array_norm(float **(&params),int array_n,int array_m)
 {
+	fprintf(stdout, "Do softmax computation here\n");
     for(int j=0;j<array_m;j++)
     {
         float col_sum=0;
@@ -62,8 +65,8 @@ void array_norm(float **(&params),int array_n,int array_m)
 float array_sum_sincolumn(float **array,int num_of_columns,int t=0,int start=0,int end=0)
 {
 	//here
-	fprintf(stdout, "Here, we add all the indices of u at time t=%d\n",t);
-	fprintf(stdout, "u from %d to %d on u axis\n", start, end);
+	fprintf(stdout, "Here, we add all the probs(softmax outputs) of u at time(frame) t=%d\n",t);
+	fprintf(stdout, "u from %d to %d(do not include %d) on u axis at time t : %d\n", start, end, end, t);
     float c=0;
     for(int i=start;i<end;i++)
     {
@@ -83,7 +86,7 @@ float ctc_loss(float **(&grad),float **params,int array_n,int array_m,
 	int *seq,int seqLen,int blank=0,bool is_prob=true)
 {
     //1.initializing the value 
-	fprintf(stdout, "Phone number : %d\nFrame number : %d\nSequence length(purely symbols comes from symbol set A) : %d\n",
+	fprintf(stdout, "Phone number(Softmax output number of NN, array_n) : %d\nFrame number(the length of training observations, array_m) : %d\nSequence length(seqLen, purely symbols comes from symbol set A) : %d\n",
 		array_n, array_m, seqLen);
 	fprintf(stdout, "The sequence is the current example for training\n\n");
 	
@@ -117,9 +120,10 @@ float ctc_loss(float **(&grad),float **params,int array_n,int array_m,
     }
 
 #ifdef _DEBUG
-	std::cout << "CTC loss trellis have been allocated\n";
+	std::cout << "CTC loss trellis have been allocated and initialized here\n";
 #endif
-    //3.transfer the params into prob form if necessary}
+    //3.transfer the params into prob form if necessary 
+	std::cout << "如果必要，将参数转换成概率形式" << std::endl;
     if (is_prob==false)
     {  
         //substracting the max
@@ -148,10 +152,11 @@ float ctc_loss(float **(&grad),float **params,int array_n,int array_m,
 	fprintf(stdout, "\n\n\nHere, we compute all values of alpha and store them to params \n");
     for(int t=1;t<T;t++)
     {
+		fprintf(stdout, "computing alpha at time (frame index) : %d\n", t);
         int start=(0>(L-2*(T-t))) ? 0:(L-2*(T-t));
         int end=((2*t+2)>L) ? L:(2*t+2);
 #ifdef _DEBUG
-		fprintf(stdout, "current u from %d to %d \n", start, end);
+		fprintf(stdout, "current u from %d to %d(do not include %d) \n", start, end, end);
 #endif
         for(int s=start;s<L;s++)
         {
@@ -173,16 +178,17 @@ float ctc_loss(float **(&grad),float **params,int array_n,int array_m,
             }
         }
         //used for debug>
-        cout<<"col num : "<<  count+1  <<"   *** : \n";
+        cout<<"Col index : "<<  count+1  <<"   of CTC computation matrix : \n";
         count++;
         for(int i=0;i<L;i++)
-            cout<<alphas[i][t]<<" ";
+			fprintf(stdout, "u = %d, t = %d, alpha[%d][%d] = %f\n", i, t, i, t, alphas[i][t]);
 		std::cout << std::endl;
         //used for debug<
         c=array_sum_sincolumn(alphas,L,t,start,end);
         //used for debug>
         cout<<endl;
-        cout<<"######the c value of Loss: "<< c  <<std::endl;
+		fprintf(stdout, "The c VALUE : %f at time (frame index) : %d\n", c, t);
+        
         //used for debug<
         for(int i=start;i<end;i++)
         {
@@ -199,7 +205,7 @@ float ctc_loss(float **(&grad),float **params,int array_n,int array_m,
         for(int t=0;t<T;t++)
         {
             for(int i=0;i<L;i++)
-                cout<<alphas[i][t]<<" ";
+				fprintf(stdout, "u = %d, t = %d, alpha[%d][%d] = %f\n", i, t, i, t, alphas[i][t]);
             cout<<endl;
         }
         //used for debug<
@@ -238,19 +244,20 @@ float ctc_loss(float **(&grad),float **params,int array_n,int array_m,
             else
             beta[s][t]=(beta[s][t+1]+beta[s+1][t+1]+beta[s+2][t+1])*params[seq[l]][t];
         }
-        /*used for debug>
-        cout<<"col num:"<<count<<"***:";
+        //*used for debug>
+        cout<<"Col index :"<<  count  <<  "   *** : \n";
         count--;
         for(int i=0;i<L;i++)
-            cout<<beta[i][t]<<" ";
+			fprintf(stdout, "u = %d, t = %d, beta[%d][%d] = %f\n", i, t, i, t, beta[i][t]);
         cout<<endl;
-        *///used for debug<
+        ///used for debug<
         c=array_sum_sincolumn(beta,L,t,start,end);
         for(int i=start;i<end;i++)
         {
             beta[i][t]=beta[i][t]/c;
         }
         llbackward+=log(c);
+		std::cout<<"llbackward : "  <<  llbackward  << std::endl;
     }
 //###############################################################################################
 //###calculate the grad#########################################################################
@@ -262,14 +269,19 @@ float ctc_loss(float **(&grad),float **params,int array_n,int array_m,
         for(int j=0;j<T;j++)
             grad[i][j]=0;
     }
+	fprintf(stdout, "Grad computation, grad matrix : rows(Softmax output) : %d, cols(frame length) : %d\n", array_n, T);
 //claculating the alphas*beta>
+	fprintf(stdout, "Computating alphas * beta here\n");
     float **ab;
     ab=new float *[L];
     for(int i=0;i<L;i++)
     {
         ab[i]=new float [T];
             for(int t=0;t<T;t++)
-                ab[i][t]=alphas[i][t]*beta[i][t];
+			{
+				ab[i][t]=alphas[i][t]*beta[i][t];
+				fprintf(stdout, "u = %d, t = %d, alpha*beta[%d][%d] = %f\n", i, t, i, t, ab[i][t]);
+			}
     }
 //claculating the alphas*beta<
     for(int s=0;s<L;s++)
@@ -291,6 +303,7 @@ float ctc_loss(float **(&grad),float **params,int array_n,int array_m,
         }
         }
     }
+	fprintf(stdout, "Done alpha*beta normalization\n");
     float *absum;
     absum=new float[T];
     array_sum_column(ab,absum,L,T);
@@ -311,7 +324,7 @@ float ctc_loss(float **(&grad),float **params,int array_n,int array_m,
 //cout<<endl;
 //}
 //<
-    if(llDiff>1e-5|| absum_0)
+    if(llDiff>1e-5  || absum_0)
         {
             cout<<"Difference in forward/backward LogLikelyhood:"<<llDiff<<endl;
             cout<<"zero found in absum"<<endl;

@@ -8,8 +8,8 @@ using namespace std;
 
 
 static bool gDoCtcTest = false;
-static bool gDoRandomGenerator = true;
-static bool gDoGraphTest = true;
+static bool gDoRandomGenerator = false;
+static bool gDoGraphTest = false;
 //do sth changing the file
 //function used to arrange dynamic memory for the array and the initialising value is 0
 /*void array_construct(float **(&array_input),int n,int m)
@@ -63,12 +63,13 @@ int main(int argc, char* argv[])
 	}
 int array_n=8;
 int array_m=12;
-int seqLen=9;
+int seqLen=4;
 //initialize the seq labels,seq stands for phone level labels
 int *seq;
-int seqini[9]={0,1,1,1,3,0,0,3,2};
-seq=new int[9];
-for(int i=0;i<9;i++)
+int seqini[4]={0,3,2,1};
+fprintf(stdout, "The length of training sequence is : %d\n", 9);
+seq=new int[4];
+for(int i=0;i<4;i++)
     seq[i]=seqini[i];
 //initialize the params array_n*array_m
 //but what this params means?
@@ -103,13 +104,13 @@ llforward=ctc_loss(grad,params,array_n,array_m,seq,seqLen,blank,false);
 cout<<"###########################"<<endl;
 cout<<"the llforward:"<<-llforward<<endl;
 cout<<"###########################"<<endl;
-cout<<"the grad calculated:"<<endl;
+cout<<"the grad calculated  :  "  <<  endl;
 for(int i=0;i<array_n;i++)
 {
-for(int t=0;t<array_m;t++)
-{
-    cout<<grad[i][t]<<" ";
-}
+	for(int t=0;t<array_m;t++)
+	{
+		fprintf(stdout, "u = %d, t = %d, grad[%d][%d] = %f\n", i, t, i, t, grad[i][t]);
+	}
     cout<<endl;
 }
 //#######decode procedure#######>
