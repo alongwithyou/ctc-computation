@@ -427,6 +427,7 @@ int NumofNodes(const SimpleDAG& graph);
 void DfsVisit(const SimpleDAG& graph, IntVector& find_times, IntVector& completed_times);
 void DfsByNode(const SimpleDAG& graph, int node_index, IntVector& find_times, IntVector& completed_times);
 void PrintLog(const SimpleDAG& mat);
+void PrintIntVector(const IntVector& vec);
 void FindingSimpleSccs(const SimpleDAG& graph, SimpleDAG& sccs);
 void DoSccFinding(const std::string& directed_graph);
 void FindSccsFromNodeGraph(const CTCFunctions::Cnode* graph, SimpleDAG& sccs);

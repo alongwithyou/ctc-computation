@@ -3,6 +3,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cmath>
+#include <boost/array.hpp>
 
 namespace CTCFunctions{
 	CTCLoss::CTCLoss(){}
@@ -69,12 +70,32 @@ void PrintLog(const SimpleDAG& mat)
 		}
 		std::cout << "\n";
 	}
+	//boost::array intarray;
+}
+
+void PrintIntVector(const IntVector& vec)
+{
+	if (vec.size() == 0)
+	{
+		std::cout << "No data to be print\n";
+		return;
+	}
+	for (int i = 0;i<vec.size();i++)
+	{
+		std::cout << vec[i] << "  ";
+	}
+	std::cout << std::endl;
+
 }
 
 
 void DfsByNode(const SimpleDAG& graph, int node_index, IntVector& find_times, IntVector& completed_times)
 {
-
+	if (graph.size() == 0 || node_index >= graph.size())
+	{
+		return;
+	}
+	
 }
 
 void DfsVisit(const SimpleDAG& graph, IntVector& find_times, IntVector& completed_times)

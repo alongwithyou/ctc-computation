@@ -152,7 +152,7 @@ float ctc_loss(float **(&grad),float **params,int array_n,int array_m,
 	fprintf(stdout, "\n\n\nHere, we compute all values of alpha and store them to params \n");
     for(int t=1;t<T;t++)
     {
-		fprintf(stdout, "computing alpha at time (frame index) : %d\n", t);
+		fprintf(stdout, "computing alpha at time (frame index) : %d from %dth frame\n", t, t-1);
         int start=(0>(L-2*(T-t))) ? 0:(L-2*(T-t));
         int end=((2*t+2)>L) ? L:(2*t+2);
 #ifdef _DEBUG
@@ -187,7 +187,7 @@ float ctc_loss(float **(&grad),float **params,int array_n,int array_m,
         c=array_sum_sincolumn(alphas,L,t,start,end);
         //used for debug>
         cout<<endl;
-		fprintf(stdout, "The c VALUE : %f at time (frame index) : %d\n", c, t);
+		fprintf(stdout, "The c VALUE : %f at time (frame index) : %d \n", c, t);
         
         //used for debug<
         for(int i=start;i<end;i++)

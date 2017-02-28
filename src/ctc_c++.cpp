@@ -2,6 +2,7 @@
 //#include"ctc_func.h"
 #include "ctc_func.h"
 #include "ctc_internal.h"
+
 using namespace CTCFunctions;
 //this is the test on the desktop 
 using namespace std;
@@ -10,6 +11,7 @@ using namespace std;
 static bool gDoCtcTest = false;
 static bool gDoRandomGenerator = false;
 static bool gDoGraphTest = false;
+static const char* author_info = "Author : Xinglong_Gao_Phd@hccl.ioa.ac.cn\n";
 //do sth changing the file
 //function used to arrange dynamic memory for the array and the initialising value is 0
 /*void array_construct(float **(&array_input),int n,int m)
@@ -49,6 +51,7 @@ float** CopyVector2TwoDimMatrix(int64_t rows, int64_t cols, std::vector<float>& 
 int main(int argc, char* argv[])
 {
 	std::cout << "CTC Algorithm test...\n";
+	std::cout << author_info << std::endl;
 	if (gDoGraphTest)
 	{
 		std::string graph_file = argv[1];
@@ -68,6 +71,8 @@ int seqLen=4;
 int *seq;
 int seqini[4]={0,3,2,1};
 fprintf(stdout, "The length of training sequence is : %d\n", 9);
+auto stringarray = std::make_shared<std::string>();
+stringarray->clear();
 seq=new int[4];
 for(int i=0;i<4;i++)
     seq[i]=seqini[i];
